@@ -37,7 +37,9 @@
             background: linear-gradient(180deg, var(--admin-dark) 0%, #312E81 100%);
             color: white;
             z-index: 1000;
-            transition: all 0.3s;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         .sidebar-brand {
@@ -298,10 +300,9 @@
         /* Responsive mobile */
         @media (max-width: 992px) {
             .sidebar {
-                width: 280px;
-                max-width: 85vw;
+                width: min(280px, 85vw);
                 transform: translateX(-100%);
-                box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+                box-shadow: 4px 0 24px rgba(0,0,0,0.2);
             }
             .sidebar.show {
                 transform: translateX(0);
@@ -314,28 +315,50 @@
             }
             .topbar {
                 padding: 0.75rem 1rem;
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
                 gap: 0.5rem;
             }
             .topbar h5 {
                 font-size: 1rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: calc(100vw - 140px);
             }
             .content-area {
                 padding: 1rem;
             }
-            /* Touch-friendly nav links */
+            /* Touch-friendly nav links (min 44px) */
             .sidebar-nav .nav-link {
                 padding: 1rem 1.5rem;
                 min-height: 48px;
                 align-items: center;
+            }
+            .sidebar-nav .nav-section {
+                margin-top: 0.75rem;
             }
             .sidebar-brand {
                 padding: 1.25rem 1rem;
             }
         }
         @media (max-width: 576px) {
+            .topbar {
+                padding: 0.6rem 0.75rem;
+            }
+            .topbar h5 {
+                font-size: 0.95rem;
+                max-width: calc(100vw - 120px);
+            }
             .topbar .admin-info span.text-muted {
                 display: none;
+            }
+            .topbar .admin-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+            .content-area {
+                padding: 0.75rem;
             }
         }
     </style>
@@ -381,24 +404,34 @@
                 <i class="bi bi-cash-stack"></i> Laporan Keuangan
             </a>
             
+            @if(Auth::guard('admin')->user()?->isSuperAdmin())
             <div class="nav-section">Pengaturan</div>
             <a href="{{ route('admin.settings.edit') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                 <i class="bi bi-gear-fill"></i> Pengaturan Website
             </a>
-            <a href="{{ route('admin.kontak.edit') }}" class="nav-link {{ request()->routeIs('admin.kontak.*') ? 'active' : '' }}">
-                <i class="bi bi-person-badge-fill"></i> Kontak Admin
+            @endif
+            @if(Auth::guard('admin')->user()?->isSuperAdmin())
+                <a href="{{ route('admin.kontak.edit') }}" class="nav-link {{ request()->routeIs('admin.kontak.*') ? 'active' : '' }}">
+                    <i class="bi bi-person-badge-fill"></i> Kontak Admin
+                </a>
+                <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                    <i class="bi bi-people-fill"></i> Manajemen Admin
+                </a>
+            @endif
+            <a href="{{ route('admin.logs.index') }}" class="nav-link {{ request()->routeIs('admin.logs.*') ? 'active' : '' }}">
+                <i class="bi bi-activity"></i> Log Aktivitas
             </a>
             
             <div class="nav-section">Lainnya</div>
+            <a href="{{ route('admin.password.edit') }}" class="nav-link {{ request()->routeIs('admin.password.*') ? 'active' : '' }}">
+                <i class="bi bi-key-fill"></i> Ganti Password
+            </a>
             <a href="{{ route('home') }}" class="nav-link" target="_blank">
                 <i class="bi bi-globe"></i> Lihat Website
             </a>
-            <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
-                @csrf
-                <button type="submit" class="nav-link w-100 text-start border-0 bg-transparent">
-                    <i class="bi bi-box-arrow-left"></i> Logout
-                </button>
-            </form>
+            <button type="button" class="nav-link w-100 text-start border-0 bg-transparent" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                <i class="bi bi-box-arrow-left"></i> Logout
+            </button>
         </nav>
     </aside>
 
@@ -437,6 +470,32 @@
             @endif
 
             @yield('content')
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Logout -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title" id="logoutModalLabel">
+                        <i class="bi bi-box-arrow-left text-primary me-2"></i>Konfirmasi Logout
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <p class="mb-0">Yakin ingin keluar dari akun?</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <form action="{{ route('admin.logout') }}" method="POST" class="d-inline" id="logoutForm">
+                        @csrf
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-left me-1"></i> Ya, Keluar
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -495,8 +554,8 @@
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && sidebar.classList.contains('show')) closeMenu();
             });
-            sidebar.querySelectorAll('.nav-link[href]').forEach(function(link) {
-                link.addEventListener('click', function() {
+            sidebar.querySelectorAll('.sidebar-nav a, .sidebar-nav button').forEach(function(el) {
+                el.addEventListener('click', function() {
                     if (window.innerWidth <= 992) closeMenu();
                 });
             });

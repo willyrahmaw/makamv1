@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BlokMakam;
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 
 class BlokMakamController extends Controller
@@ -26,7 +27,8 @@ class BlokMakamController extends Controller
             'keterangan' => 'nullable|string|max:255',
         ]);
 
-        BlokMakam::create($validated);
+        $created = BlokMakam::create($validated);
+        ActivityLogService::log('blok_create', $created);
 
         return redirect()->route('admin.blok.index')->with('success', 'Blok makam berhasil ditambahkan.');
     }
@@ -44,16 +46,22 @@ class BlokMakamController extends Controller
         ]);
 
         $blok->update($validated);
+        ActivityLogService::log('blok_update', $blok);
 
         return redirect()->route('admin.blok.index')->with('success', 'Blok makam berhasil diperbarui.');
     }
 
     public function destroy(BlokMakam $blok)
     {
+        if (!auth('admin')->user()?->isSuperAdmin()) {
+            return redirect()->route('admin.blok.index')->with('error', 'Admin tidak diizinkan menghapus data.');
+        }
+
         if ($blok->makam()->count() > 0) {
             return redirect()->route('admin.blok.index')->with('error', 'Tidak dapat menghapus blok yang masih memiliki data makam.');
         }
 
+        ActivityLogService::log('blok_delete', $blok);
         $blok->delete();
 
         return redirect()->route('admin.blok.index')->with('success', 'Blok makam berhasil dihapus.');

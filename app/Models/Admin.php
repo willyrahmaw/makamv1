@@ -14,6 +14,7 @@ class Admin extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'role',
         'password',
     ];
 
@@ -27,5 +28,10 @@ class Admin extends Authenticatable
         return [
             'password' => 'hashed',
         ];
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return ($this->role ?? 'admin') === 'superadmin';
     }
 }

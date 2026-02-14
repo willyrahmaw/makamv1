@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sejarah;
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 
 class SejarahController extends Controller
@@ -34,7 +35,8 @@ class SejarahController extends Controller
             Sejarah::where('aktif', true)->update(['aktif' => false]);
         }
 
-        Sejarah::create($validated);
+        $created = Sejarah::create($validated);
+        ActivityLogService::log('sejarah_create', $created);
 
         return redirect()->route('admin.sejarah.index')->with('success', 'Sejarah berhasil ditambahkan.');
     }
@@ -60,12 +62,18 @@ class SejarahController extends Controller
         }
 
         $sejarah->update($validated);
+        ActivityLogService::log('sejarah_update', $sejarah);
 
         return redirect()->route('admin.sejarah.index')->with('success', 'Sejarah berhasil diperbarui.');
     }
 
     public function destroy(Sejarah $sejarah)
     {
+        if (!auth('admin')->user()?->isSuperAdmin()) {
+            return redirect()->route('admin.sejarah.index')->with('error', 'Admin tidak diizinkan menghapus data.');
+        }
+
+        ActivityLogService::log('sejarah_delete', $sejarah);
         $sejarah->delete();
 
         return redirect()->route('admin.sejarah.index')->with('success', 'Sejarah berhasil dihapus.');

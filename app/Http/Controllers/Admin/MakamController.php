@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Makam;
 use App\Models\BlokMakam;
 use App\Services\ImageCompressionService;
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -79,10 +80,15 @@ class MakamController extends Controller
             'ahli_waris' => 'nullable|string|max:255',
             'telepon_ahli_waris' => 'nullable|string|max:20',
             'keterangan' => 'nullable|string',
-            'foto' => 'nullable|image|max:15360', // 15MB
+            'foto' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:15360',
         ];
-
-        $validated = $request->validate($rules);
+        $messages = [
+            'foto.image' => 'Foto makam harus berupa file gambar (JPEG, PNG, atau WebP).',
+            'foto.mimes' => 'Format foto tidak diizinkan. Hanya JPEG, PNG, atau WebP.',
+            'foto.max' => 'Ukuran foto maksimal 15 MB.',
+            'foto.uploaded' => 'Upload foto gagal. Pastikan file valid dan ukurannya tidak melebihi 15 MB.',
+        ];
+        $validated = $request->validate($rules, $messages);
         $validated['dikenali'] = (bool) $request->input('dikenali', true);
 
         // Semua field nullable: simpan apa adanya (null jika kosong)
@@ -93,10 +99,12 @@ class MakamController extends Controller
 
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
-            // Validasi MIME type secara eksplisit
             $allowedMimes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedMimes)) {
                 return back()->withErrors(['foto' => 'Format file tidak diizinkan. Hanya JPEG, PNG, GIF, atau WebP.'])->withInput();
+            }
+            if ($file->getSize() > 15 * 1024 * 1024) {
+                return back()->withErrors(['foto' => 'Ukuran foto maksimal 15 MB.'])->withInput();
             }
             // Simpan image ukuran asli (hanya kompresi kualitas, tanpa resize)
             $compressionService = new ImageCompressionService();
@@ -109,7 +117,8 @@ class MakamController extends Controller
             }
         }
 
-        Makam::create($validated);
+        $created = Makam::create($validated);
+        ActivityLogService::log('makam_create', $created);
 
         return redirect()->route('admin.makam.index')->with('success', 'Data makam berhasil ditambahkan.');
     }
@@ -145,10 +154,15 @@ class MakamController extends Controller
             'ahli_waris' => 'nullable|string|max:255',
             'telepon_ahli_waris' => 'nullable|string|max:20',
             'keterangan' => 'nullable|string',
-            'foto' => 'nullable|image|max:15360', // 15MB
+            'foto' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:15360',
         ];
-
-        $validated = $request->validate($rules);
+        $messages = [
+            'foto.image' => 'Foto makam harus berupa file gambar (JPEG, PNG, GIF, atau WebP).',
+            'foto.mimes' => 'Format foto tidak diizinkan. Hanya JPEG, PNG, GIF, atau WebP.',
+            'foto.max' => 'Ukuran foto maksimal 15 MB.',
+            'foto.uploaded' => 'Upload foto gagal. Pastikan file valid dan ukurannya tidak melebihi 15 MB.',
+        ];
+        $validated = $request->validate($rules, $messages);
         $validated['dikenali'] = (bool) $request->input('dikenali', true);
 
         // Semua field nullable: simpan apa adanya (null jika kosong)
@@ -159,10 +173,12 @@ class MakamController extends Controller
 
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
-            // Validasi MIME type secara eksplisit
             $allowedMimes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedMimes)) {
                 return back()->withErrors(['foto' => 'Format file tidak diizinkan. Hanya JPEG, PNG, GIF, atau WebP.'])->withInput();
+            }
+            if ($file->getSize() > 15 * 1024 * 1024) {
+                return back()->withErrors(['foto' => 'Ukuran foto maksimal 15 MB.'])->withInput();
             }
             if ($makam->foto) {
                 Storage::disk('public')->delete($makam->foto);
@@ -183,12 +199,17 @@ class MakamController extends Controller
         }
 
         $makam->update($validated);
+        ActivityLogService::log('makam_update', $makam);
 
         return redirect()->route('admin.makam.index')->with('success', 'Data makam berhasil diperbarui.');
     }
 
     public function destroy(Makam $makam)
     {
+        if (!auth('admin')->user()?->isSuperAdmin()) {
+            return redirect()->route('admin.makam.index')->with('error', 'Admin tidak diizinkan menghapus data.');
+        }
+
         if ($makam->foto) {
             Storage::disk('public')->delete($makam->foto);
         }
@@ -196,6 +217,7 @@ class MakamController extends Controller
             Storage::disk('public')->delete($makam->cover);
         }
 
+        ActivityLogService::log('makam_delete', $makam);
         $makam->delete();
 
         return redirect()->route('admin.makam.index')->with('success', 'Data makam berhasil dihapus.');

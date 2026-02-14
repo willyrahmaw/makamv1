@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Keuangan;
 use App\Exports\KeuanganExport;
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Maatwebsite\Excel\Facades\Excel;
@@ -121,7 +122,8 @@ class KeuanganController extends Controller
             'nominal' => 'required|numeric|min:0',
         ]);
 
-        Keuangan::create($data);
+        $created = Keuangan::create($data);
+        ActivityLogService::log('keuangan_create', $created);
 
         return redirect()->route('admin.keuangan.index')
             ->with('success', 'Transaksi keuangan berhasil ditambahkan.');
@@ -147,6 +149,7 @@ class KeuanganController extends Controller
         ]);
 
         $keuangan->update($data);
+        ActivityLogService::log('keuangan_update', $keuangan);
 
         return redirect()->route('admin.keuangan.index')
             ->with('success', 'Transaksi keuangan berhasil diperbarui.');
@@ -154,6 +157,12 @@ class KeuanganController extends Controller
 
     public function destroy(Keuangan $keuangan)
     {
+        if (!auth('admin')->user()?->isSuperAdmin()) {
+            return redirect()->route('admin.keuangan.index')
+                ->with('error', 'Admin tidak diizinkan menghapus data.');
+        }
+
+        ActivityLogService::log('keuangan_delete', $keuangan);
         $keuangan->delete();
 
         return redirect()->route('admin.keuangan.index')

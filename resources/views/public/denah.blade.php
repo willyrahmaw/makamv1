@@ -129,14 +129,19 @@
 <!-- Daftar per Blok -->
 <h3 class="mt-5 mb-4" style="color: var(--primary);"><i class="bi bi-list-ul me-2"></i>Daftar Makam per Blok</h3>
 
+@php
+    $perBlok = 5; // Tampilkan 5 makam per blok di denah, sisanya via "Lihat selanjutnya"
+@endphp
 @foreach($bloks->sortBy('nama_blok') as $blok)
 <div class="card mb-4 blok-table" id="blok-{{ strtolower(str_replace(' ', '-', $blok->nama_blok)) }}">
-    <div class="card-header" style="background: var(--primary); color: white;">
-        <i class="bi bi-grid-3x3-gap me-2"></i>{{ $blok->nama_blok }}
-        @if($blok->keterangan)
-            <small class="ms-2 text-light opacity-75">- {{ $blok->keterangan }}</small>
-        @endif
-        <span class="badge bg-light text-dark float-end">{{ $blok->makam->count() }} makam</span>
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2" style="background: var(--primary); color: white;">
+        <div>
+            <i class="bi bi-grid-3x3-gap me-2"></i>{{ $blok->nama_blok }}
+            @if($blok->keterangan)
+                <small class="ms-2 text-light opacity-75">- {{ $blok->keterangan }}</small>
+            @endif
+        </div>
+        <span class="badge bg-light text-dark">{{ $blok->makam->count() }} makam</span>
     </div>
     <div class="card-body p-0">
         @if($blok->makam->count() > 0)
@@ -152,7 +157,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($blok->makam as $m)
+                    @foreach($blok->makam->take($perBlok) as $m)
                     <tr>
                         <td>
                             <span class="badge" style="background: var(--primary);">{{ $m->nomor_makam ?: $loop->iteration }}</span>
@@ -181,6 +186,19 @@
                 </tbody>
             </table>
         </div>
+        @if($blok->makam->count() > $perBlok)
+        <div class="card-footer bg-light border-0 py-3 text-center">
+            <a href="{{ route('blok.show', $blok) }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-right-circle me-1"></i>Lihat selanjutnya ({{ $blok->makam->count() - $perBlok }} makam lagi) di {{ $blok->nama_blok }}
+            </a>
+        </div>
+        @else
+        <div class="card-footer bg-light border-0 py-2 text-center">
+            <a href="{{ route('blok.show', $blok) }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-list-ul me-1"></i>Lihat semua makam di {{ $blok->nama_blok }}
+            </a>
+        </div>
+        @endif
         @else
         <div class="text-center py-4 text-muted">
             <i class="bi bi-inbox" style="font-size: 2rem;"></i>

@@ -1,59 +1,242 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Digitalisasi Makam – Dokumentasi Proyek
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+### 1. Deskripsi Singkat
 
-## About Laravel
+Proyek ini adalah aplikasi **digitalisasi makam** berbasis **Laravel**, digunakan untuk:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Menampilkan **denah makam**, blok, dan detail makam ke publik.
+- Menyajikan **laporan keuangan publik**.
+- Menyediakan **panel admin** untuk mengelola:
+  - Data makam dan blok makam.
+  - Sejarah desa.
+  - Transaksi keuangan.
+  - Pengaturan website dan kontak admin.
+  - Manajemen akun admin.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 2. Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Halaman publik**
+  - Denah & blok makam.
+  - Pencarian makam.
+  - Laporan keuangan publik.
 
-## Learning Laravel
+- **Panel Admin**
+  - CRUD data makam, blok, sejarah, keuangan.
+  - Manajemen admin (tambah/edit/hapus admin lain – khusus superadmin).
+  - Pengaturan warna blok, logo, dan konten informatif.
+  - Pengaturan kontak admin.
+  - **Ganti password** untuk akun admin yang sedang login.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Role & Akses**
+  - **Superadmin**:
+    - Akses penuh, termasuk hapus data, pengaturan website, kontak admin, manajemen admin, dan melihat seluruh **log aktivitas**.
+  - **Admin**:
+    - Bisa tambah/edit data, **tidak bisa hapus data utama**.
+    - Tidak bisa mengakses Pengaturan Website, Kontak Admin, dan Manajemen Admin.
+    - Bisa membuka menu **Log Aktivitas**, tetapi **hanya melihat log aktivitas miliknya sendiri**.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Teknologi
 
-## Laravel Sponsors
+- **Framework**: Laravel (PHP ≥ 8.1).
+- **Basis data**: MySQL / MariaDB.
+- **Front-end**: Blade, Bootstrap 5, Bootstrap Icons.
+- **Lainnya**: Chart.js untuk grafik keuangan.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## Instalasi & Konfigurasi
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+> Untuk panduan instalasi lebih detail, lihat juga `README_install.md`.  
+> Di bawah ini ringkasan langkah dari nol sampai siap jalan.
 
-## Contributing
+### 1. Persyaratan
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- PHP ≥ 8.1 (projek ini dikonfigurasi untuk berjalan di PHP **8.3.27**).
+- Composer.
+- MySQL / MariaDB.
+- Web server (Apache/Nginx) dengan document root diarahkan ke folder `public/`.
 
-## Code of Conduct
+### 2. Clone / Salin Proyek
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+git clone <repo-url> makam_laravel
+cd makam_laravel
+```
 
-## Security Vulnerabilities
+Atau upload folder proyek ke server (mis. `/var/www/makam_laravel`).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 3. Install Dependency
 
-## License
+```bash
+composer install
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+> Catatan: `composer.json` sudah mengatur platform PHP untuk kompatibel dengan server 8.3.27.
+
+### 4. Konfigurasi `.env`
+
+Salin file contoh:
+
+```bash
+cp .env.example .env
+```
+
+Lalu sesuaikan nilai penting:
+
+```env
+APP_NAME="Digitalisasi Makam"
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://domain-anda.com
+
+APP_LOCALE=id
+APP_FALLBACK_LOCALE=en
+APP_FAKER_LOCALE=id_ID
+APP_TIMEZONE=Asia/Jakarta
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=nama_database
+DB_USERNAME=nama_user
+DB_PASSWORD=password
+
+SESSION_DRIVER=database   # atau file
+SESSION_LIFETIME=120
+```
+
+### 5. Generate APP_KEY
+
+```bash
+php artisan key:generate
+```
+
+### 6. Migrasi & Seeder
+
+```bash
+php artisan migrate --force
+php artisan db:seed   # jika DatabaseSeeder sudah mengatur seeder yang dibutuhkan
+```
+
+**Admin awal** (dari `AdminSeeder` saat ini):
+
+- Email: `admin@makam.com`
+- Password: `admin123`  
+  → **wajib diganti** setelah login pertama lewat menu **Ganti Password**.
+
+### 7. Storage Link
+
+```bash
+php artisan storage:link
+```
+
+### 8. Konfigurasi Web Server
+
+Pastikan document root mengarah ke `public/`, contoh Apache:
+
+```apache
+DocumentRoot "/var/www/makam_laravel/public"
+<Directory "/var/www/makam_laravel/public">
+    AllowOverride All
+    Require all granted
+</Directory>
+```
+
+---
+
+## Penggunaan Aplikasi
+
+### 1. Login Admin
+
+- URL login admin: `https://domain-anda.com/admin/login`
+- Login dengan akun admin yang sudah tersedia / disediakan seeder.
+
+### 2. Menu Utama Admin
+
+- **Dashboard**: ringkasan data.
+- **Data Makam / Blok / Sejarah / Keuangan**: CRUD data sesuai hak akses role.
+- **Pengaturan Website** (superadmin):
+  - Warna blok, meta SEO, logo, dsb.
+- **Kontak Admin** (superadmin):
+  - Telepon, email, alamat, jam layanan.
+- **Manajemen Admin** (superadmin):
+  - Tambah, edit, hapus admin lain, atur role (`admin` / `superadmin`).
+- **Ganti Password**:
+  - Ganti password akun yang sedang login (superadmin maupun admin).
+- **Log Aktivitas**:
+  - Superadmin: melihat semua log.
+  - Admin biasa: hanya log miliknya sendiri.
+
+---
+
+## Keamanan & Sekuriti
+
+### 1. Autentikasi & Session
+
+- Menggunakan **guard `admin`** (Laravel Auth) untuk admin panel.
+- **Session**:
+  - Driver default `database` (atau `file` jika diubah di `.env`).
+  - `SESSION_LIFETIME` mengatur durasi idle (menit).
+  - Session diregenerasi saat login (`regenerate()`) dan logout (`invalidate()`, `regenerateToken()`), untuk mencegah **session fixation**.
+  - Session ID disimpan di cookie, **tidak di URL**.
+
+### 2. Role & Izin
+
+- Tabel `admins` memiliki kolom `role` (`superadmin` / `admin`).
+- **Superadmin**:
+  - Bisa hapus data, mengakses pengaturan, kontak, manajemen admin, melihat seluruh log.
+- **Admin**:
+  - Tidak bisa menghapus data utama (dicegah di middleware `forbid_admin_delete` + pengecekan di controller).
+  - Tidak bisa mengakses menu superadmin-only (disembunyikan di UI dan dibatasi di route/controller).
+
+### 3. Kebijakan Password
+
+Di form:
+
+- **Tambah admin**, **edit admin** (jika mengubah password), dan **Ganti Password** menggunakan aturan:
+  - Minimal **8 karakter**.
+  - Wajib mengandung:
+    - **Huruf besar**,
+    - **Huruf kecil**,
+    - **Simbol** (mis. `@#$%^&*`).
+- Password di-hash menggunakan **`Hash::make()`** (bcrypt, sesuai konfigurasi Laravel).
+
+### 4. Proteksi Login
+
+- **Captcha manual**: penjumlahan angka sederhana pada form login admin.
+- **Rate limiting login**:
+  - Maksimal percobaan login per IP dalam jangka waktu tertentu (menggunakan `RateLimiter` Laravel).
+  - Jika terlampaui, user mendapat pesan menunggu sebelum mencoba lagi.
+
+### 5. Audit Log Aktivitas
+
+- Tabel `activity_logs` menyimpan:
+  - `admin_id`, `event`, `model_type`, `model_id`, `route`, `method`, `ip`, `user_agent`, `payload`, timestamps.
+- Dicatat untuk:
+  - CRUD data makam, blok, keuangan, sejarah, pengaturan, kontak, admin.
+  - Login sukses/gagal, logout, rate-limit login, ganti password.
+- **Akses:**
+  - **Superadmin**: melihat seluruh log.
+  - **Admin**: hanya log miliknya sendiri.
+
+### 6. Praktik Tambahan yang Disarankan
+
+- **Ganti password default** admin segera setelah instalasi.
+- Gunakan **HTTPS** (SSL/TLS) di server produksi.
+- Atur **backup database** rutin.
+- Batasi akses ke server (SSH key, firewall, dsb.).
+- Nonaktifkan `APP_DEBUG` di produksi (`APP_DEBUG=false`).
+
+---
+
+## Perintah Artisan Berguna
+
+```bash
+# Optimasi konfigurasi & route
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Bersihkan seluruh cache & file hasil optimasi
+php artisan optimize:clear
+```

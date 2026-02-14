@@ -1,0 +1,123 @@
+:root {
+    --admin-primary: #4F46E5;
+    --admin-dark: #111827;
+    --admin-border: #E5E7EB;
+    --admin-muted: #6B7280;
+    --admin-bg: #F3F4F6;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--admin-bg);
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 420px;
+}
+
+.login-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 2.25rem 2rem 1.75rem;
+    box-shadow:
+        0 18px 40px rgba(15, 23, 42, 0.08),
+        0 0 0 1px rgba(148, 163, 184, 0.18);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 1.75rem;
+}
+
+.login-header .icon {
+    width: 60px;
+    height: 60px;
+    background: #EEF2FF;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.9rem;
+    color: var(--admin-primary);
+    font-size: 1.7rem;
+}
+
+.login-header h4 {
+    color: var(--admin-dark);
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.login-header p {
+    color: var(--admin-muted);
+    font-size: 0.9rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-control {
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--admin-border);
+    background: #ffffff;
+}
+
+.form-control::placeholder {
+    color: #6B7280;
+}
+
+.form-control:focus {
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
+}
+
+.form-check-label {
+    color: var(--admin-muted);
+}
+
+.btn-login {
+    background: var(--admin-primary);
+    border: none;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-weight: 600;
+    width: 100%;
+}
+
+.btn-login:hover {
+    background: #4338CA;
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 1.25rem;
+    font-size: .85rem;
+}
+
+.back-link a {
+    color: var(--admin-muted);
+    text-decoration: none;
+}
+
+.back-link a:hover {
+    color: var(--admin-primary);
+}
+
+@media (max-width: 576px) {
+    body {
+        padding: 1.25rem;
+    }
+    .login-card {
+        padding: 2rem 1.6rem 1.6rem;
+    }
+}

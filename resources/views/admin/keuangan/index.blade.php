@@ -196,13 +196,15 @@
                                     <a href="{{ route('admin.keuangan.edit', $row) }}" class="btn btn-outline-primary">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form action="{{ route('admin.keuangan.destroy', $row) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" class="btn btn-outline-danger btn-delete-confirm" data-message="Yakin ingin menghapus transaksi ini?">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    @if(Auth::guard('admin')->user()?->isSuperAdmin())
+                                        <form action="{{ route('admin.keuangan.destroy', $row) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-outline-danger btn-delete-confirm" data-message="Yakin ingin menghapus transaksi ini?">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

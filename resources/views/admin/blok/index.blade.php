@@ -35,6 +35,7 @@
                                 <a href="{{ route('admin.blok.edit', $blok) }}" class="btn btn-outline-primary" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+                                @if(Auth::guard('admin')->user()?->isSuperAdmin())
                                 <form action="{{ route('admin.blok.destroy', $blok) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
@@ -42,6 +43,7 @@
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
