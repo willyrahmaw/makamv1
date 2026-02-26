@@ -36,7 +36,8 @@ class AdminUserController extends Controller
             ],
             'role' => 'nullable|in:superadmin,admin',
         ], [
-            'password' => 'Password minimal 8 karakter, harus mengandung huruf besar, huruf kecil, dan minimal satu simbol (mis. @#$%^&*).',
+            'password' => 'Password minimal 8 karakter, harus mengandung huruf besar, 
+            huruf kecil, dan minimal satu simbol (mis. @#$%^&*).',
         ]);
 
         $created = Admin::create([
@@ -70,7 +71,8 @@ class AdminUserController extends Controller
             ],
             'role' => 'nullable|in:superadmin,admin',
         ], [
-            'password' => 'Password minimal 8 karakter, harus mengandung huruf besar, huruf kecil, dan minimal satu simbol (mis. @#$%^&*).',
+            'password' => 'Password minimal 8 karakter, harus mengandung huruf besar, 
+            huruf kecil, dan minimal satu simbol (mis. @#$%^&*).',
         ]);
 
         $user->name = $validated['name'];

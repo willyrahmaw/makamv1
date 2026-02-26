@@ -101,14 +101,14 @@ class MakamController extends Controller
             $file = $request->file('foto');
             $allowedMimes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedMimes)) {
-                return back()->withErrors(['foto' => 'Format file tidak diizinkan. Hanya JPEG, PNG, GIF, atau WebP.'])->withInput();
+                return back()->withErrors(['foto' => 'Format file tidak diizinkan. Hanya JPEG, PNG, atau WebP.'])->withInput();
             }
             if ($file->getSize() > 15 * 1024 * 1024) {
                 return back()->withErrors(['foto' => 'Ukuran foto maksimal 15 MB.'])->withInput();
             }
-            // Simpan image ukuran asli (hanya kompresi kualitas, tanpa resize)
+            // Simpan image dengan kompresi & resize, target ukuran maksimal ~1 MB
             $compressionService = new ImageCompressionService();
-            $validated['foto'] = $compressionService->compressAndStore($file, 'makam', 'public', 85, 99999, 99999);
+            $validated['foto'] = $compressionService->compressAndStore($file, 'makam', 'public', 70, 800, 600, 1 * 1024 * 1024);
             
             // Generate cover image otomatis (800x600 dengan crop center)
             $coverPath = $compressionService->generateCover($file, 'makam', 'public', 800, 600, 85);
@@ -187,9 +187,9 @@ class MakamController extends Controller
             if ($makam->cover) {
                 Storage::disk('public')->delete($makam->cover);
             }
-            // Simpan image ukuran asli (hanya kompresi kualitas, tanpa resize)
+            // Simpan image dengan kompresi & resize, target ukuran maksimal ~1 MB
             $compressionService = new ImageCompressionService();
-            $validated['foto'] = $compressionService->compressAndStore($file, 'makam', 'public', 85, 99999, 99999);
+            $validated['foto'] = $compressionService->compressAndStore($file, 'makam', 'public', 85, 1920, 1920, 1 * 1024 * 1024);
             
             // Generate cover image otomatis (800x600 dengan crop center)
             $coverPath = $compressionService->generateCover($file, 'makam', 'public', 800, 600, 85);

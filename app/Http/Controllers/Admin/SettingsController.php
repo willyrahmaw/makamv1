@@ -31,7 +31,7 @@ class SettingsController extends Controller
         $rules = [
             'site_name' => 'required|string|max:255',
             'site_description' => 'nullable|string',
-            'site_logo' => 'nullable|image|mimes:jpeg,jpg,png,gif,svg,webp|max:2048',
+            'site_logo' => 'nullable|image|mimes:jpeg,jpg,png,gif,svg,webp|max:1024',
             'footer_text' => 'nullable|string',
             'meta_description' => 'nullable|string|max:255',
             'meta_keywords' => 'nullable|string|max:255',
@@ -49,8 +49,8 @@ class SettingsController extends Controller
         $messages = [
             'site_logo.image' => 'Logo harus berupa file gambar (JPEG, PNG, atau WebP).',
             'site_logo.mimes' => 'Format logo tidak diizinkan. Hanya JPEG, PNG, atau WebP.',
-            'site_logo.max' => 'Ukuran logo maksimal 2 MB.',
-            'site_logo.uploaded' => 'Upload logo gagal. Pastikan file valid dan ukurannya tidak melebihi 2 MB.',
+            'site_logo.max' => 'Ukuran logo maksimal 1 MB.',
+            'site_logo.uploaded' => 'Upload logo gagal. Pastikan file valid dan ukurannya tidak melebihi 1 MB.',
         ];
         $request->validate($rules, $messages);
 
@@ -83,8 +83,8 @@ class SettingsController extends Controller
             if (!in_array($file->getMimeType(), $allowedMimes)) {
                 return back()->withErrors(['site_logo' => 'Format file tidak diizinkan. Hanya JPEG, PNG, atau WebP.'])->withInput();
             }
-            if ($file->getSize() > 2 * 1024 * 1024) {
-                return back()->withErrors(['site_logo' => 'Ukuran logo maksimal 2 MB.'])->withInput();
+            if ($file->getSize() > 1 * 1024 * 1024) {
+                return back()->withErrors(['site_logo' => 'Ukuran logo maksimal 1 MB.'])->withInput();
             }
             // Delete old logo if exists
             $oldLogo = Settings::get('site_logo');
@@ -93,7 +93,8 @@ class SettingsController extends Controller
             }
             // Compress dan simpan image (SVG akan disimpan langsung tanpa compression)
             $compressionService = new ImageCompressionService();
-            $logoPath = $compressionService->compressAndStore($file, 'logos', 'public', 90, 800, 800);
+            // Simpan logo sebagai WEBP dengan target ukuran ~1 MB
+            $logoPath = $compressionService->compressAndStore($file, 'logos', 'public', 90, 800, 800, 1 * 1024 * 1024);
             Settings::set('site_logo', $logoPath);
         }
 

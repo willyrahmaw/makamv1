@@ -32,7 +32,8 @@ class AdminPasswordController extends Controller
             'password_current.required' => 'Password saat ini wajib diisi.',
             'password.required' => 'Password baru wajib diisi.',
             'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
-            'password' => 'Password baru minimal 8 karakter, harus mengandung huruf besar, huruf kecil, dan minimal satu simbol (mis. @#$%^&*).',
+            'password' => 'Password baru minimal 8 karakter, harus mengandung huruf besar, 
+            huruf kecil, dan minimal satu simbol (mis. @#$%^&*).',
         ]);
 
         $user = Auth::guard('admin')->user();
